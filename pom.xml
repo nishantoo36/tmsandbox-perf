@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>co.nz.tmsandbox</groupId>
+  <artifactId>tmsandbox-perf</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>TM Sandbox Categories API – Gatling Performance Tests</name>
+  <description>
+    Gatling (Java) performance test suite for the TM Sandbox Categories API.
+    Covers NFR-01 through NFR-04 with configurable ramp-up, steady state,
+    throughput, and VUser count.
+  </description>
+
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- ── Gatling ──────────────────────────────────────────────────────── -->
+    <gatling.version>3.11.5</gatling.version>
+    <gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
+
+    <!-- ── Test parameters (all overridable via -D on the CLI) ─────────── -->
+    <!--
+      NFR-01  vUsers  = half of 10 category IDs = 5
+      NFR-02  rampUp  = 1 VUser/s → 5 s to reach full load
+      NFR-03  10 API calls in 60 s steady state
+              → throttle at ceil(10/60) = 1 req/s; or let 5 users naturally
+                produce ~10 requests over 60 s (≈0.17 req/s per user)
+      NFR-04  p90 ≤ 500 ms (validated in assertions / report)
+    -->
+    <perf.vUsers>5</perf.vUsers>
+    <perf.rampUpSeconds>5</perf.rampUpSeconds>
+    <perf.steadyStateSeconds>60</perf.steadyStateSeconds>
+    <!-- Total requests target for the steady-state window (NFR-03) -->
+    <perf.totalRequests>10</perf.totalRequests>
+    <!-- p90 SLA threshold in milliseconds (NFR-04) -->
+    <perf.p90ThresholdMs>500</perf.p90ThresholdMs>
+    <!-- Comma-separated category IDs under test -->
+    <perf.categoryIds>6327,6328,6329,6330,6331,6332,6333,6334,6335,6336</perf.categoryIds>
+    <!-- Results CSV output path (relative to project root) -->
+    <perf.csvOutput>results/category_results.csv</perf.csvOutput>
+  </properties>
+
+  <dependencies>
+    <!-- Gatling core + HTTP DSL -->
+    <dependency>
+      <groupId>io.gatling.highcharts</groupId>
+      <artifactId>gatling-charts-highcharts</artifactId>
+      <version>${gatling.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Jackson for JSON response parsing in assertions -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.17.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <groupId>io.gatling</groupId>
+        <artifactId>gatling-maven-plugin</artifactId>
+        <version>${gatling-maven-plugin.version}</version>
+        <configuration>
+          <!-- Run headless (no interactive menu) -->
+          <runMultipleSimulations>false</runMultipleSimulations>
+          <simulationClass>simulations.CategoriesApiSimulation</simulationClass>
+          <!-- Forward all perf.* properties as system properties into the JVM -->
+          <jvmArgs>
+            <jvmArg>-Dperf.vUsers=${perf.vUsers}</jvmArg>
+            <jvmArg>-Dperf.rampUpSeconds=${perf.rampUpSeconds}</jvmArg>
+            <jvmArg>-Dperf.steadyStateSeconds=${perf.steadyStateSeconds}</jvmArg>
+            <jvmArg>-Dperf.totalRequests=${perf.totalRequests}</jvmArg>
+            <jvmArg>-Dperf.p90ThresholdMs=${perf.p90ThresholdMs}</jvmArg>
+            <jvmArg>-Dperf.categoryIds=${perf.categoryIds}</jvmArg>
+            <jvmArg>-Dperf.csvOutput=${perf.csvOutput}</jvmArg>
+          </jvmArgs>
+          <resultsFolder>${project.basedir}/reports</resultsFolder>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>17</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

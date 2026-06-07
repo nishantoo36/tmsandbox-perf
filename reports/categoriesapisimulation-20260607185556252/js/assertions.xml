@@ -1,0 +1,11 @@
+<testsuite name="simulations.CategoriesApiSimulation" tests="3" errors="0" failures="3" time="0">
+  <testcase name="Global: 90th percentile of response time is less than 500.0" status="false" time="0">
+  <failure type="Global: 90th percentile of response time is less than 500.0">Actual value: 1268.0</failure>
+</testcase>
+<testcase name="Global: percentage of successful events is greater than or equal to 100.0" status="false" time="0">
+  <failure type="Global: percentage of successful events is greater than or equal to 100.0">Actual value: 90.0</failure>
+</testcase>
+<testcase name="Global: mean of response time is less than 500.0" status="false" time="0">
+  <failure type="Global: mean of response time is less than 500.0">Actual value: 824.0</failure>
+</testcase>
+</testsuite>
