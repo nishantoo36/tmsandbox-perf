@@ -7,7 +7,7 @@ target/
 # macOS
 .DS_Store
 
-# Keep committed evidence explicit rather than every generated run.
+# Keep committed evidence explicit rather than every run output folder.
 reports/categoriesapisimulation-*/
 !reports/categoriesapisimulation-20260607185556252/
 !reports/categoriesapisimulation-20260607185556252/**

@@ -10,7 +10,7 @@
   <version>1.0.0</version>
   <packaging>jar</packaging>
 
-  <name>TM Sandbox Categories API – Gatling Performance Tests</name>
+  <name>TM Sandbox Categories API - Gatling Performance Tests</name>
   <description>
     Gatling (Java) performance test suite for the TM Sandbox Categories API.
     Covers NFR-01 through NFR-04 with configurable ramp-up, steady state,
@@ -21,41 +21,25 @@
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <!-- ── Gatling ──────────────────────────────────────────────────────── -->
     <gatling.version>3.11.5</gatling.version>
     <gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
 
-    <!-- ── Test parameters (all overridable via -D on the CLI) ─────────── -->
-    <!--
-      NFR-01  vUsers  = half of 10 category IDs = 5
-      NFR-02  rampUp  = 1 VUser/s → 5 s to reach full load
-      NFR-03  10 API calls in 60 s steady state
-              → throttle at ceil(10/60) = 1 req/s; or let 5 users naturally
-                produce ~10 requests over 60 s (≈0.17 req/s per user)
-      NFR-04  p90 ≤ 500 ms (validated in assertions / report)
-    -->
     <perf.vUsers>5</perf.vUsers>
     <perf.rampUpSeconds>5</perf.rampUpSeconds>
     <perf.steadyStateSeconds>60</perf.steadyStateSeconds>
-    <!-- Total requests target for the steady-state window (NFR-03) -->
     <perf.totalRequests>10</perf.totalRequests>
-    <!-- p90 SLA threshold in milliseconds (NFR-04) -->
     <perf.p90ThresholdMs>500</perf.p90ThresholdMs>
-    <!-- Comma-separated category IDs under test -->
     <perf.categoryIds>6327,6328,6329,6330,6331,6332,6333,6334,6335,6336</perf.categoryIds>
-    <!-- Results CSV output path (relative to project root) -->
     <perf.csvOutput>results/category_results.csv</perf.csvOutput>
   </properties>
 
   <dependencies>
-    <!-- Gatling core + HTTP DSL -->
     <dependency>
       <groupId>io.gatling.highcharts</groupId>
       <artifactId>gatling-charts-highcharts</artifactId>
       <version>${gatling.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Jackson for JSON response parsing in assertions -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
@@ -75,7 +59,6 @@
           <!-- Run headless (no interactive menu) -->
           <runMultipleSimulations>false</runMultipleSimulations>
           <simulationClass>simulations.CategoriesApiSimulation</simulationClass>
-          <!-- Forward all perf.* properties as system properties into the JVM -->
           <jvmArgs>
             <jvmArg>-Dperf.vUsers=${perf.vUsers}</jvmArg>
             <jvmArg>-Dperf.rampUpSeconds=${perf.rampUpSeconds}</jvmArg>

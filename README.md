@@ -10,21 +10,26 @@ The test covers the supplied category IDs `6327` through `6336`, validates the r
 
 ```text
 tmsandbox-perf/
-├── pom.xml
-├── README.md
-├── src/test/java/
-│   ├── assertions/ResponseValidator.java
-│   ├── model/CsvWriter.java
-│   ├── model/PromotionRecord.java
-│   ├── model/TestConfig.java
-│   └── simulations/CategoriesApiSimulation.java
-├── src/test/resources/logback-test.xml
-├── results/category_results.csv
-└── reports/
-    ├── lastRun.txt
-    └── categoriesapisimulation-20260607185556252/
-        ├── index.html
-        └── simulation.log
+|-- pom.xml
+|-- README.md
+|-- src/test/java/
+|   |-- assertions/ResponseValidator.java
+|   |-- model/CsvWriter.java
+|   |-- model/PromotionRecord.java
+|   |-- model/TestConfig.java
+|   `-- simulations/
+|       |-- CategoriesApiSimulation.java
+|       |-- CategoryDetailsScenario.java
+|       |-- CategoryIdFeeder.java
+|       |-- RequestBudget.java
+|       `-- StartupLog.java
+|-- src/test/resources/logback-test.xml
+|-- results/category_results.csv
+`-- reports/
+    |-- lastRun.txt
+    `-- categoriesapisimulation-20260607185556252/
+        |-- index.html
+        `-- simulation.log
 ```
 
 ## Prerequisites
@@ -100,13 +105,11 @@ The simulation uses a small layered design:
 
 ```text
 CategoriesApiSimulation
-  ├─ TestConfig: reads runtime properties
-  ├─ round-robin category feeder
-  ├─ Gatling HTTP checks: status, content type, CategoryId, CanRelist
-  └─ ResponseValidator
-       ├─ parses JSON response
-       ├─ validates CategoryId and CanRelist again in Java
-       └─ writes all promotion rows to CSV through CsvWriter
+  |-- CategoryDetailsScenario: HTTP flow and Gatling checks
+  |-- CategoryIdFeeder: round-robin category ID data
+  |-- RequestBudget: caps the run at the configured request count
+  |-- ResponseValidator: scripted response validation and extraction
+  `-- CsvWriter: thread-safe CSV output
 ```
 
 The CSV writer is thread-safe, using a lock around appends so concurrent virtual users cannot interleave rows.
@@ -214,7 +217,7 @@ The assignment uses a very low request volume, so this is best treated as a base
 | A1 | The endpoint is public and does not require authentication. |
 | A2 | The supplied category IDs are the complete required data set for this assignment. |
 | A3 | `perf.totalRequests=10` means exactly 10 request attempts for the default run, not 10 requests per user. |
-| A4 | A category response that fails `CanRelist=true` should be counted as a failed request and should not be written to the CSV output. |
+| A4 | A category response that fails `CanRelist=true` should be counted as a failed request. If the response is otherwise parseable, its category/promotion data is still written to CSV for reporting. |
 | A5 | The `Promotions` array may contain multiple entries; each entry must produce its own CSV row. |
 | A6 | `Price` is written exactly as returned by the API, without currency formatting or rounding. |
 | A7 | Results are environment-sensitive because the target is a public internet endpoint. The included report reflects the local run captured in this repository. |
