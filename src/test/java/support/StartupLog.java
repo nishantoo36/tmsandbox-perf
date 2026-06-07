@@ -1,10 +1,10 @@
-package simulations;
+package support;
 
-import model.TestConfig;
+import config.TestConfig;
 
-final class StartupLog {
+public final class StartupLog {
 
-    static void print() {
+    public static void print() {
         System.out.printf("""
                 
                 TM Sandbox Categories API performance test

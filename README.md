@@ -14,16 +14,18 @@ tmsandbox-perf/
 |-- README.md
 |-- src/test/java/
 |   |-- assertions/ResponseValidator.java
+|   |-- config/TestConfig.java
+|   |-- feeders/CategoryIdFeeder.java
 |   |-- model/CsvWriter.java
 |   |-- model/PromotionRecord.java
-|   |-- model/TestConfig.java
-|   `-- simulations/
-|       |-- CategoriesApiSimulation.java
-|       |-- CategoryDetailsScenario.java
-|       |-- CategoryIdFeeder.java
+|   |-- scenarios/CategoryDetailsScenario.java
+|   |-- simulations/CategoriesApiSimulation.java
+|   `-- support/
 |       |-- RequestBudget.java
 |       `-- StartupLog.java
-|-- src/test/resources/logback-test.xml
+|-- src/test/resources/
+|   |-- logback-test.xml
+|   `-- performance.properties
 |-- results/category_results.csv
 `-- reports/
     |-- lastRun.txt
@@ -62,10 +64,13 @@ cat results/category_results.csv
 
 ## Configuration
 
-All execution parameters are Maven properties and can be changed with `-D`.
+Default execution data lives in `src/test/resources/performance.properties`. Edit that file when you want to change the endpoint, category IDs, VUser count, timing, throughput target, SLA, or CSV path for a normal local run.
+
+Any value in the file can still be overridden from the command line with `-D`, which is useful for CI or one-off experiments.
 
 | Property | Default | Purpose |
 |---|---:|---|
+| `perf.baseUrl` | `https://api.tmsandbox.co.nz` | API host under test. |
 | `perf.vUsers` | `5` | VUsers/threads. Default is half of the 10 supplied category IDs. |
 | `perf.rampUpSeconds` | `5` | Ramp duration. With 5 users, this ramps at 1 VUser per second. |
 | `perf.steadyStateSeconds` | `60` | Window used to pace the configured request count. |
@@ -78,6 +83,8 @@ Example:
 
 ```bash
 mvn gatling:test \
+  -Dperf.baseUrl=https://api.tmsandbox.co.nz \
+  -Dperf.categoryIds=6327,6328,6329,6330,6331,6332,6333,6334,6335,6336 \
   -Dperf.vUsers=5 \
   -Dperf.rampUpSeconds=5 \
   -Dperf.steadyStateSeconds=60 \
@@ -107,6 +114,7 @@ The simulation uses a small layered design:
 CategoriesApiSimulation
   |-- CategoryDetailsScenario: HTTP flow and Gatling checks
   |-- CategoryIdFeeder: round-robin category ID data
+  |-- TestConfig: reads performance.properties and command-line overrides
   |-- RequestBudget: caps the run at the configured request count
   |-- ResponseValidator: scripted response validation and extraction
   `-- CsvWriter: thread-safe CSV output

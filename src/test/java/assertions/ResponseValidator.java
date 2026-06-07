@@ -2,9 +2,9 @@ package assertions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import config.TestConfig;
 import model.CsvWriter;
 import model.PromotionRecord;
-import model.TestConfig;
 
 import java.util.ArrayList;
 import java.util.List;

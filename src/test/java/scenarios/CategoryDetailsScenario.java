@@ -1,10 +1,12 @@
-package simulations;
+package scenarios;
 
 import assertions.ResponseValidator;
+import config.TestConfig;
+import feeders.CategoryIdFeeder;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
-import model.TestConfig;
+import support.RequestBudget;
 
 import static io.gatling.javaapi.core.CoreDsl.bodyString;
 import static io.gatling.javaapi.core.CoreDsl.feed;
@@ -15,12 +17,12 @@ import static io.gatling.javaapi.http.HttpDsl.header;
 import static io.gatling.javaapi.http.HttpDsl.http;
 import static io.gatling.javaapi.http.HttpDsl.status;
 
-final class CategoryDetailsScenario {
+public final class CategoryDetailsScenario {
 
     private final CategoryIdFeeder categoryIdFeeder = new CategoryIdFeeder(TestConfig.CATEGORY_IDS);
     private final RequestBudget requestBudget = new RequestBudget(TestConfig.TOTAL_REQUESTS);
 
-    HttpProtocolBuilder httpProtocol() {
+    public HttpProtocolBuilder httpProtocol() {
         return http
                 .baseUrl(TestConfig.BASE_URL)
                 .acceptHeader("application/json")
@@ -28,7 +30,7 @@ final class CategoryDetailsScenario {
                 .userAgentHeader("Gatling-PerfTest/1.0");
     }
 
-    ScenarioBuilder build() {
+    public ScenarioBuilder build() {
         return scenario("Categories API Load Test")
                 .repeat(TestConfig.requestsPerUser()).on(
                         pause(TestConfig.requestPace())

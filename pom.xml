@@ -24,13 +24,6 @@
     <gatling.version>3.11.5</gatling.version>
     <gatling-maven-plugin.version>4.9.6</gatling-maven-plugin.version>
 
-    <perf.vUsers>5</perf.vUsers>
-    <perf.rampUpSeconds>5</perf.rampUpSeconds>
-    <perf.steadyStateSeconds>60</perf.steadyStateSeconds>
-    <perf.totalRequests>10</perf.totalRequests>
-    <perf.p90ThresholdMs>500</perf.p90ThresholdMs>
-    <perf.categoryIds>6327,6328,6329,6330,6331,6332,6333,6334,6335,6336</perf.categoryIds>
-    <perf.csvOutput>results/category_results.csv</perf.csvOutput>
   </properties>
 
   <dependencies>
@@ -59,15 +52,6 @@
           <!-- Run headless (no interactive menu) -->
           <runMultipleSimulations>false</runMultipleSimulations>
           <simulationClass>simulations.CategoriesApiSimulation</simulationClass>
-          <jvmArgs>
-            <jvmArg>-Dperf.vUsers=${perf.vUsers}</jvmArg>
-            <jvmArg>-Dperf.rampUpSeconds=${perf.rampUpSeconds}</jvmArg>
-            <jvmArg>-Dperf.steadyStateSeconds=${perf.steadyStateSeconds}</jvmArg>
-            <jvmArg>-Dperf.totalRequests=${perf.totalRequests}</jvmArg>
-            <jvmArg>-Dperf.p90ThresholdMs=${perf.p90ThresholdMs}</jvmArg>
-            <jvmArg>-Dperf.categoryIds=${perf.categoryIds}</jvmArg>
-            <jvmArg>-Dperf.csvOutput=${perf.csvOutput}</jvmArg>
-          </jvmArgs>
           <resultsFolder>${project.basedir}/reports</resultsFolder>
         </configuration>
         <executions>

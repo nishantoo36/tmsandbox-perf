@@ -1,7 +1,9 @@
 package simulations;
 
+import config.TestConfig;
 import io.gatling.javaapi.core.Simulation;
-import model.TestConfig;
+import scenarios.CategoryDetailsScenario;
+import support.StartupLog;
 
 import java.time.Duration;
 
