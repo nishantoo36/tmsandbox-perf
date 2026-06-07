@@ -15,7 +15,6 @@ tmsandbox-perf/
 |-- src/test/java/
 |   |-- assertions/ResponseValidator.java
 |   |-- config/TestConfig.java
-|   |-- feeders/CategoryIdFeeder.java
 |   |-- model/CsvWriter.java
 |   |-- model/PromotionRecord.java
 |   |-- scenarios/CategoryDetailsScenario.java
@@ -113,7 +112,6 @@ The simulation uses a small layered design:
 ```text
 CategoriesApiSimulation
   |-- CategoryDetailsScenario: HTTP flow and Gatling checks
-  |-- CategoryIdFeeder: round-robin category ID data
   |-- TestConfig: reads performance.properties and command-line overrides
   |-- RequestBudget: caps the run at the configured request count
   |-- ResponseValidator: scripted response validation and extraction

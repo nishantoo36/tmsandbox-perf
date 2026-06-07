@@ -2,11 +2,16 @@ package scenarios;
 
 import assertions.ResponseValidator;
 import config.TestConfig;
-import feeders.CategoryIdFeeder;
 import io.gatling.javaapi.core.ChainBuilder;
 import io.gatling.javaapi.core.ScenarioBuilder;
 import io.gatling.javaapi.http.HttpProtocolBuilder;
 import support.RequestBudget;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static io.gatling.javaapi.core.CoreDsl.bodyString;
 import static io.gatling.javaapi.core.CoreDsl.feed;
@@ -19,8 +24,8 @@ import static io.gatling.javaapi.http.HttpDsl.status;
 
 public final class CategoryDetailsScenario {
 
-    private final CategoryIdFeeder categoryIdFeeder = new CategoryIdFeeder(TestConfig.CATEGORY_IDS);
     private final RequestBudget requestBudget = new RequestBudget(TestConfig.TOTAL_REQUESTS);
+    private final AtomicInteger categoryIndex = new AtomicInteger();
 
     public HttpProtocolBuilder httpProtocol() {
         return http
@@ -40,7 +45,7 @@ public final class CategoryDetailsScenario {
     }
 
     private ChainBuilder categoryDetailsRequest() {
-        return feed(categoryIdFeeder::circular)
+        return feed(this::categoryIdFeeder)
                 .exec(
                         http("GET /v1/Categories/#{categoryId}/Details.json")
                                 .get("/v1/Categories/#{categoryId}/Details.json")
@@ -72,5 +77,12 @@ public final class CategoryDetailsScenario {
                     }
                     return session;
                 });
+    }
+
+    private Iterator<Map<String, Object>> categoryIdFeeder() {
+        return Stream.generate(() -> {
+            int current = Math.floorMod(categoryIndex.getAndIncrement(), TestConfig.CATEGORY_IDS.size());
+            return Collections.<String, Object>singletonMap("categoryId", TestConfig.CATEGORY_IDS.get(current));
+        }).iterator();
     }
 }
